@@ -70,6 +70,10 @@ type Token @entity {
   whitelistPools: [Pool!]!
   # derived fields
   tokenDayData: [TokenDayData!]! @derivedFrom(field: "token")
+
+  currentPriceUSD: BigDecimal
+  # timestamp of last price update
+  lastPriceUpdate: BigInt
 }
 
 type Pool @entity {
@@ -236,7 +240,7 @@ type Position @entity {
   # vars needed for fee computation
   feeGrowthInside0LastX128: BigInt!
   feeGrowthInside1LastX128: BigInt!
-  
+
   # derived fields
   increaseEvents: [IncreaseEvent!]! @derivedFrom(field: "position")
   decreaseEvents: [IncreaseEvent!]! @derivedFrom(field: "position")
@@ -393,6 +397,16 @@ type Swap @entity {
   tick: BigInt!
   # index within the txn
   logIndex: BigInt
+
+  token0PriceUSD: BigDecimal
+  # USD price per token1 at time of swap
+  token1PriceUSD: BigDecimal
+  # USD value of amount0
+  amount0USD: BigDecimal
+  # USD value of amount
+  amount1USD: BigDecimal
+  # whether this pool contains stable tokens
+  isStablePool: Boolean
 }
 
 type Collect @entity {
@@ -667,7 +681,7 @@ type TokenHourData @entity {
   # close price USD
   close: BigDecimal!
 }
-	type IncreaseEvent @entity {
+type IncreaseEvent @entity {
   id: ID!
   pool: Pool!
   tokenID: BigInt!
@@ -675,7 +689,7 @@ type TokenHourData @entity {
   position: Position!
   amount0: BigInt!
   amount1: BigInt!
-#  amountUSD: BigDecimal!
+  #  amountUSD: BigDecimal!
   token0: Token!
   token1: Token!
   timeStamp: BigInt!
